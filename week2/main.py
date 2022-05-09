@@ -18,5 +18,17 @@ blob = cv2.dnn.blobFromImage(img, mean=MEAN_VALUE)
 
 print(blob.shape)
 
+# 결과추론
+net.setInput(blob)
+output = net.forward()
+
+# 후처리
+output = output.squeeze().transpose((1, 2, 0))
+output += MEAN_VALUE
+
+output = np.clip(output, 0, 255)
+output = output.astype('uint8')
+
+cv2.imshow('output', output)
 cv2.imshow('img', img)
 cv2.waitKey(0)
