@@ -3,6 +3,12 @@ import cv2
 
 facenet = cv2.dnn.readNet('models/deploy.prototxt', 'models/res10_300x300_ssd_iter_140000.caffemodel')
 
+gender_list = ['Male', 'Female']
+age_list = ['(0, 2)','(4, 6)','(8, 12)','(15, 20)','(25, 32)','(38, 43)','(48, 53)','(60, 100)']
+
+gender_net = cv2.dnn.readNetFromCaffe('models/deploy_gender.prototxt', 'models/gender_net.caffemodel')
+age_net = cv2.dnn.readNetFromCaffe('models/deploy_age.prototxt', 'models/age_net.caffemodel')
+
 img = cv2.imread('imgs/02.jpg')
 
 h, w, c = img.shape
@@ -29,6 +35,17 @@ for i in range(dets.shape[2]):
 
     face = img[y1:y2, x1:x2]
 
+    blob = cv2.dnn.blobFromImage(face, size=(227, 227), mean=(78.4263377603, 87.7689143744, 114.895847746))
+
+    gender_net.setInput(blob)
+    gender_index = gender_net.forward().squeeze().argmax()
+    gender = gender_list[gender_index]
+
+    age_net.setInput(blob)
+    age_index = age_net.forward().squeeze().argmax()
+    age = age_list[age_index]
+
+    cv2.putText(img, '%s, %s' % (gender, age), org=(x1, y1-10), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0,0,255), thickness=2)
     cv2.rectangle(img, pt1=(x1, y1), pt2=(x2, y2), color=(255, 0, 0), thickness=2)
 
 
