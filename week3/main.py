@@ -40,8 +40,23 @@ while True:
         x2 = int(dets[0, 0, i, 5] * w)
         y2 = int(dets[0, 0, i, 6] * h)
 
+        # 얼굴 영역 잘라내고 전처리
+        face = img[y1:y2, x1:x2]
+
+        face_input = cv2.resize(face, dsize=(224, 224))
+        face_input = cv2.cvtColor(face_input, cv2.COLOR_BGR2RGB)
+        face_input = preprocess_input(face_input)
+        face_input = np.expand_dims(face_input, axis=0)
+
+        mask, nomask = model.predict(face_input).squeeze()
+
+        if mask > nomask:
+            color = (0, 255, 0)
+        else:
+            color = (0, 0, 255)
+
         # 사각형 그리기
-        cv2.rectangle(img, pt1=(x1, y1), pt2=(x2, y2), thickness=2, color=(0, 255, 0))
+        cv2.rectangle(img, pt1=(x1, y1), pt2=(x2, y2), thickness=2, color=color)
 
     cv2.imshow('result', img)
     if cv2.waitKey(1) == ord('q'):
