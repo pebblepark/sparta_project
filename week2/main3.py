@@ -1,41 +1,32 @@
 import cv2
 import numpy as np
 
-net = cv2.dnn.readNetFromTorch('models/instance_norm/feathers.t7')
-net2 = cv2.dnn.readNetFromTorch('models/instance_norm/the_scream.t7')
+net = cv2.dnn.readNetFromTorch('models/instance_norm/starry_night.t7')
 
-img = cv2.imread('imgs/hw.jpg')
+cap = cv2.VideoCapture('imgs/03.mp4')
 
-h, w, c = img.shape
+while True:
+	ret, img = cap.read()
 
-img = cv2.resize(img, dsize=(int(w / h * 300), 300))
+	if ret == False:
+		break
 
-MEAN_VALUE = [103.939, 116.779, 123.680]
-blob = cv2.dnn.blobFromImage(img, mean=MEAN_VALUE)
+	h, w, c = img.shape
+	img = cv2.resize(img, dsize=(int(w / h * 300), 300))
 
-net.setInput(blob)
-output = net.forward()
+	MEAN_VALUE = [103.939, 116.779, 123.680]
+	blob = cv2.dnn.blobFromImage(img, mean=MEAN_VALUE)
 
-output = output.squeeze().transpose((1, 2, 0))
+	net.setInput(blob)
+	output = net.forward()
 
-output += MEAN_VALUE
-output = np.clip(output, 0, 255)
-output = output.astype('uint8')
+	output = output.squeeze().transpose((1, 2, 0))
 
-net2.setInput(blob)
-output2 = net2.forward()
+	output += MEAN_VALUE
+	output = np.clip(output, 0, 255)
+	output = output.astype('uint8')
 
-output2 = output2.squeeze().transpose((1, 2, 0))
+	cv2.imshow('result', output)
 
-output2 += MEAN_VALUE
-output2 = np.clip(output2, 0, 255)
-output2 = output2.astype('uint8')
-
-output = output[0:150, :]
-output2 = output2[150:300, :]
-
-output3 = np.concatenate([output, output2], axis=0)
-
-cv2.imshow('img', img)
-cv2.imshow('result', output3)
-cv2.waitKey(0)
+	if cv2.waitKey(1) == ord('q'):
+		break
