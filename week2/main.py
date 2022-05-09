@@ -2,13 +2,15 @@ import cv2
 import numpy as np
 
 # 딥러닝 모델 로드하기
-net = cv2.dnn.readNetFromTorch('models/eccv16/starry_night.t7')
+net = cv2.dnn.readNetFromTorch('models/instance_norm/mosaic.t7')
 
-img = cv2.imread('imgs/01.jpg')
+img = cv2.imread('imgs/02.jpg')
 
 h, w, c = img.shape
 
 img = cv2.resize(img, dsize=(500, int(h / w * 500)))
+
+img = img[162:513, 185: 428]
 
 print(img.shape)
 
