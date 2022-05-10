@@ -39,6 +39,16 @@ output_bgr = output_bgr * 255
 output_bgr = np.clip(output_bgr, 0, 255)
 output_bgr = output_bgr.astype('uint8')
 
+mask = np.zeros_like(img, dtype='uint8')
+mask = cv2.circle(mask, center=(260, 260), radius=200, color=(1, 1, 1), thickness=-1)
+
+color = output_bgr * mask
+gray = img * (1 - mask)
+
+output2 = color + gray
+
+cv2.imshow('result2', output2)
+
 cv2.imshow('img', img)
 cv2.imshow('output', output_bgr)
 cv2.waitKey(0)
